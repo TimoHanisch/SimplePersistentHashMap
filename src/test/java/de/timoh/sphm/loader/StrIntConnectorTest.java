@@ -33,18 +33,13 @@ public class StrIntConnectorTest {
         instance.initialize(map);
     }
 
-    @After
-    public void tearDown() throws SQLException {
-        instance.getConnectorInfo().close();
-    }
-
     /**
      * Test of all implemented functions
      *
      * @throws java.sql.SQLException
      */
     @Test
-    public void testPutLoad() throws SQLException {
+    public void testPutLoad() throws Exception {
         System.out.println("CLEAR SQL TABLE");
         instance.forceClear();
         System.out.println("PUT/LOAD");

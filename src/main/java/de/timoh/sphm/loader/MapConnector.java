@@ -1,5 +1,7 @@
 package de.timoh.sphm.loader;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -19,29 +21,38 @@ public abstract class MapConnector<K, V> {
         this.connectorInfo = connectorInfo;
     }
 
-    public abstract MapConnector<K, V> initialize(Map<K,V> map) throws Exception;
+    public abstract MapConnector<K, V> initialize(Map<K, V> map) throws Exception;
 
     public abstract MapConnector<K, V> load() throws Exception;
 
-    public abstract MapConnector<K, V> forceSynchronization() throws SQLException;
+    public abstract MapConnector<K, V> forceSynchronization() throws Exception;
 
-    public abstract MapConnector<K, V> put(K key, V value) throws SQLException;
+    public abstract MapConnector<K, V> put(K key, V value) throws Exception;
 
-    public abstract MapConnector<K, V> remove(K key) throws SQLException;
-    
-    public void forceClear() throws SQLException{
-        String stm = "TRUNCATE "+connectorInfo.getTableName()+";";
-        connectorInfo.getConnection().prepareStatement(stm).execute();
+    public abstract MapConnector<K, V> remove(K key) throws Exception;
+
+    public void forceClear() throws Exception {
+        String stm = "TRUNCATE " + connectorInfo.getTableName() + ";";
+        try (Connection con = connectorInfo.getConnection(); PreparedStatement prepStm = con.prepareStatement(stm)) {
+            prepStm.execute();
+        }
+    }
+
+    public void forceDelete() throws Exception {
+        String stm = "DROP " + connectorInfo.getTableName() + ";";
+        try (Connection con = connectorInfo.getConnection(); PreparedStatement prepStm = con.prepareStatement(stm)) {
+            prepStm.execute();
+        }
     }
 
     public ConnectorInformation getConnectorInfo() {
         return connectorInfo;
     }
 
-    protected void setMap(Map<K,V> map) {
+    protected void setMap(Map<K, V> map) {
         this.map = map;
     }
-    
+
     public Map<K, V> getMap() {
         return map;
     }

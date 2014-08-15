@@ -2,7 +2,6 @@ package de.timoh.sphm;
 
 import de.timoh.sphm.loader.ConnectorInformation;
 import de.timoh.sphm.loader.MapConnector;
-import java.sql.SQLException;
 import java.util.HashMap;
 
 public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
@@ -13,7 +12,7 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
 
     private final MapConnector<K, V> mapConnector;
 
-    protected SimplePersistentHashMap(ConnectorInformation connectorInformation, MapConnector<K, V> mapConnector) throws SQLException {
+    protected SimplePersistentHashMap(ConnectorInformation connectorInformation, MapConnector<K, V> mapConnector) {
         super();
         this.connectorInformation = connectorInformation;
         this.mapConnector = mapConnector;
@@ -24,7 +23,7 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
         try {
             this.mapConnector.initialize(this).load();
         } catch (Exception e) {
-            //LOG.error(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -32,8 +31,8 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
     public V put(K key, V value) {
         try {
             mapConnector.put(key, value);
-        } catch (SQLException ex) {
-
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
         return super.put(key, value);
     }
@@ -42,8 +41,8 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
     public V remove(Object key) {
         try {
             mapConnector.remove((K) key);
-        } catch (SQLException ex) {
-
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
         return super.remove(key);
     }
@@ -62,16 +61,8 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
     public void forceSynchronization() {
         try {
             mapConnector.forceSynchronization();
-        } catch (SQLException ex) {
-
-        }
-    }
-
-    public void close() {
-        try {
-            connectorInformation.close();
-        } catch (SQLException ex) {
-
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 }
