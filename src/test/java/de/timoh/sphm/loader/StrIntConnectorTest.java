@@ -39,7 +39,7 @@ public class StrIntConnectorTest {
     }
 
     /**
-     * Test of load method, of class StrIntConnector.
+     * Test of all implemented functions
      *
      * @throws java.sql.SQLException
      */
