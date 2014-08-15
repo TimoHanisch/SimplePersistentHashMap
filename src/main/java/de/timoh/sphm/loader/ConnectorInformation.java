@@ -26,7 +26,8 @@ public class ConnectorInformation {
         // Iterate through all existing tables to check if the one already exists.
         ResultSet tables = metaData.getTables(null, null, "%", null);
         while (tables.next()) {
-            if (tables.getString(3).equals(this.tableName)) {
+            String localName = tables.getString(3);
+            if (localName.equals(this.tableName)) {
                 return true;
             }
         }

@@ -19,7 +19,7 @@ public abstract class MapConnector<K, V> {
         this.connectorInfo = connectorInfo;
     }
 
-    public abstract void initialize(Map<K,V> map) throws SQLException;
+    public abstract void initialize(Map<K,V> map) throws Exception;
 
     public abstract void load() throws SQLException;
 

@@ -17,16 +17,16 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
         super();
         this.connectorInformation = connectorInformation;
         this.mapConnector = mapConnector;
+        initialize();
     }
 
-    private void load() {
+    private void initialize() {
         try {
+            this.mapConnector.initialize(this);
             // Since the table does not exist we create one with the given name
-            if (!connectorInformation.tableExists()) {
-
-            }
+            
             mapConnector.load();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             //LOG.error(e);
         }
     }
@@ -56,7 +56,7 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
      */
     public void reload() {
         super.clear();
-        load();
+        initialize();
     }
 
     /**
