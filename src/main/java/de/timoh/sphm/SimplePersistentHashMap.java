@@ -22,10 +22,7 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
 
     private void initialize() {
         try {
-            this.mapConnector.initialize(this);
-            // Since the table does not exist we create one with the given name
-            
-            mapConnector.load();
+            this.mapConnector.initialize(this).load();
         } catch (Exception e) {
             //LOG.error(e);
         }

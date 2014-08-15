@@ -19,15 +19,20 @@ public abstract class MapConnector<K, V> {
         this.connectorInfo = connectorInfo;
     }
 
-    public abstract void initialize(Map<K,V> map) throws Exception;
+    public abstract MapConnector<K, V> initialize(Map<K,V> map) throws Exception;
 
-    public abstract void load() throws SQLException;
+    public abstract MapConnector<K, V> load() throws Exception;
 
-    public abstract void forceSynchronization() throws SQLException;
+    public abstract MapConnector<K, V> forceSynchronization() throws SQLException;
 
-    public abstract void put(K key, V value) throws SQLException;
+    public abstract MapConnector<K, V> put(K key, V value) throws SQLException;
 
-    public abstract V remove(K key) throws SQLException;
+    public abstract MapConnector<K, V> remove(K key) throws SQLException;
+    
+    public void forceClear() throws SQLException{
+        String stm = "TRUNCATE "+connectorInfo.getTableName()+";";
+        connectorInfo.getConnection().prepareStatement(stm).execute();
+    }
 
     public ConnectorInformation getConnectorInfo() {
         return connectorInfo;

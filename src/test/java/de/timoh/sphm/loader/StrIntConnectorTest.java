@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package de.timoh.sphm.loader;
 
 import java.sql.SQLException;
@@ -19,26 +13,26 @@ import org.junit.Test;
  * @author Timo Hanisch (timohanisch@gmail.com)
  */
 public class StrIntConnectorTest {
-    
+
     private final static String dbUrl = "jdbc:postgresql://localhost/maspmemo";
-    
+
     private final static String dbUser = "postgres";
-    
+
     private final static String dbPw = "postgres";
-    
+
     private final static String tableName = "testmap";
-    
+
     private StrIntConnector instance;
-    
+
     private final Map<String, Integer> map = new HashMap<>();
-    
+
     @Before
     public void setUp() throws Exception {
         ConnectorInformation connectorInformation = new ConnectorInformation(dbUrl, dbUser, dbPw, tableName);
         instance = new StrIntConnector(connectorInformation);
         instance.initialize(map);
     }
-    
+
     @After
     public void tearDown() throws SQLException {
         instance.getConnectorInfo().close();
@@ -46,52 +40,45 @@ public class StrIntConnectorTest {
 
     /**
      * Test of load method, of class StrIntConnector.
+     *
      * @throws java.sql.SQLException
      */
     @Test
-    public void testLoad() throws SQLException {
-        System.out.println("load");
+    public void testPutLoad() throws SQLException {
+        System.out.println("CLEAR SQL TABLE");
+        instance.forceClear();
+        System.out.println("PUT/LOAD");
+        assertEquals(map.size(), 0);
+
+        instance.put("foo", 42);
         instance.load();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+        assertEquals(map.size(), 1);
 
-    /**
-     * Test of forceSynchronization method, of class StrIntConnector.
-     */
-    @Test
-    public void testForceSynchronization() throws SQLException {
-        System.out.println("forceSynchronization");
+        instance.put("bar", 1337);
+        instance.load();
+        assertEquals(map.size(), 2);
+
+        System.out.println("FORCECLEAR");
+
+        instance.forceClear();
+        instance.load();
+        assertEquals(map.size(), 0);
+
+        System.out.println("FORCESYNCHRONIZATION");
+        
+        map.put("foo", 42);
+        map.put("bar", 1337);
+        instance.load();
+        assertEquals(map.size(), 0);
+        
+        map.put("foo", 42);
+        map.put("bar", 1337);
         instance.forceSynchronization();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(map.size(), 2);
+        
+        System.out.println("REMOVE");
+        instance.remove("foo");
+        instance.load();
+        assertEquals(map.size(), 1);
     }
-
-    /**
-     * Test of put method, of class StrIntConnector.
-     */
-    @Test
-    public void testPut() throws SQLException {
-        System.out.println("put");
-        String key = "";
-        Integer value = null;
-        instance.put(key, value);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of remove method, of class StrIntConnector.
-     */
-    @Test
-    public void testRemove() throws SQLException {
-        System.out.println("remove");
-        String key = "";
-        Integer expResult = null;
-        Integer result = instance.remove(key);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-    
 }
