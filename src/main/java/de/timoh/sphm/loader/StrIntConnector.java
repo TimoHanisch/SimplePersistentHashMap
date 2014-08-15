@@ -3,7 +3,6 @@ package de.timoh.sphm.loader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Map;
 
 /**
@@ -35,11 +34,23 @@ public class StrIntConnector extends MapConnector<String, Integer> {
     @Override
     public MapConnector<String, Integer> forceSynchronization() throws Exception {
         try (Connection con = getConnectorInfo().getConnection()) {
+            forceClear();
+            int n = 0;
+            StringBuilder values = new StringBuilder();
             for (String s : getMap().keySet()) {
-                String stm = "SELECT insertIfExistsStrInt('" + s + "', " + getMap().get(s) + ");";
-                try (PreparedStatement prepStm = con.prepareStatement(stm)) {
-                    prepStm.execute();
+                if(n == BLOCK_INSERT_COUNT || n == getMap().size() - 1) {
+                    String stm = "INSERT INTO " + getConnectorInfo().getTableName() + "(key,value) VALUES "+values.toString()+";";
+                    try (PreparedStatement prepStm = con.prepareStatement(stm)) {
+                        prepStm.execute();
+                    }
+                    values = new StringBuilder();
+                    n = 0;
                 }
+                values = values.append("(").append("'").append(s).append("'").append(",").append(getMap().get(s)).append(")");
+                if(n + 1 != BLOCK_INSERT_COUNT && n + 1 != getMap().size() - 1) {
+                    values = values.append(",");
+                }
+                n++;
             }
         }
         return this;

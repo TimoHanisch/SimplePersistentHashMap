@@ -65,4 +65,20 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
             throw new RuntimeException(ex);
         }
     }
+
+    public void forceClear() {
+        try {
+            mapConnector.forceClear();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
+    public void forceDelete() {
+        try {
+            mapConnector.forceDelete();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 }

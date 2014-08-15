@@ -35,7 +35,8 @@ public class ConnectorInformation {
             SharedPoolDataSource tds = new SharedPoolDataSource();
             tds.setConnectionPoolDataSource(cpds);
             tds.setMaxTotal(10);
-
+            tds.setMaxConnLifetimeMillis(1000);
+            
             dataSource = tds;
             dataSourceMap.put(tableName, dataSource);
         }

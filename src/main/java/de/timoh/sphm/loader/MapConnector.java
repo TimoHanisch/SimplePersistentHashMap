@@ -2,7 +2,6 @@ package de.timoh.sphm.loader;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.Map;
 
 /**
@@ -13,6 +12,8 @@ import java.util.Map;
  */
 public abstract class MapConnector<K, V> {
 
+    public static final int BLOCK_INSERT_COUNT = 500;
+    
     private final ConnectorInformation connectorInfo;
 
     private Map<K, V> map;
@@ -39,7 +40,7 @@ public abstract class MapConnector<K, V> {
     }
 
     public void forceDelete() throws Exception {
-        String stm = "DROP " + connectorInfo.getTableName() + ";";
+        String stm = "DROP TABLE " + connectorInfo.getTableName() + ";";
         try (Connection con = connectorInfo.getConnection(); PreparedStatement prepStm = con.prepareStatement(stm)) {
             prepStm.execute();
         }

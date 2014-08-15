@@ -1,9 +1,7 @@
 package de.timoh.sphm.loader;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,20 +58,41 @@ public class StrIntConnectorTest {
         assertEquals(map.size(), 0);
 
         System.out.println("FORCESYNCHRONIZATION");
-        
+
         map.put("foo", 42);
         map.put("bar", 1337);
         instance.load();
         assertEquals(map.size(), 0);
-        
+
         map.put("foo", 42);
         map.put("bar", 1337);
         instance.forceSynchronization();
         assertEquals(map.size(), 2);
-        
+
         System.out.println("REMOVE");
         instance.remove("foo");
         instance.load();
         assertEquals(map.size(), 1);
+
+        instance.forceClear();
+        
+        int uniqueInserts = 100000;
+        long time = System.nanoTime();
+        for (int i = 0; i < uniqueInserts; i++) {
+            map.put("Entry" + i, i);
+        }
+        System.out.println("Standard HashMap took " + ((System.nanoTime() - time) / 1000000000.) + "seconds for " + uniqueInserts + " puts");
+        
+        map.clear();
+        instance.forceClear();
+        
+        time = System.nanoTime();
+        for (int i = 0; i < uniqueInserts; i++) {
+            map.put("Entry" + i, i);
+        }
+        instance.forceSynchronization();
+        System.out.println("MapConnector took " + ((System.nanoTime() - time) / 1000000000.) + "seconds for " + uniqueInserts + " puts");
+        
+        instance.forceDelete();
     }
 }
