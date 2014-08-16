@@ -20,14 +20,14 @@ public class StrIntConnectorTest {
 
     private final static String tableName = "testmap";
 
-    private StrIntConnector instance;
+    private StrIntBlockingConnector instance;
 
     private final Map<String, Integer> map = new HashMap<>();
 
     @Before
     public void setUp() throws Exception {
         ConnectorInformation connectorInformation = new ConnectorInformation(dbUrl, dbUser, dbPw, tableName);
-        instance = new StrIntConnector(connectorInformation);
+        instance = new StrIntBlockingConnector(connectorInformation);
         instance.initialize(map);
     }
 
@@ -75,24 +75,51 @@ public class StrIntConnectorTest {
         assertEquals(map.size(), 1);
 
         instance.forceClear();
-        
+
         int uniqueInserts = 100000;
         long time = System.nanoTime();
         for (int i = 0; i < uniqueInserts; i++) {
             map.put("Entry" + i, i);
         }
         System.out.println("Standard HashMap took " + ((System.nanoTime() - time) / 1000000000.) + "seconds for " + uniqueInserts + " puts");
-        
+
         map.clear();
         instance.forceClear();
-        
+
         time = System.nanoTime();
         for (int i = 0; i < uniqueInserts; i++) {
             map.put("Entry" + i, i);
         }
         instance.forceSynchronization();
         System.out.println("MapConnector took " + ((System.nanoTime() - time) / 1000000000.) + "seconds for " + uniqueInserts + " puts");
+
+        Map<String, Integer> map2 = new HashMap<>();
+        for (int i = 0; i < uniqueInserts; i++) {
+            map2.put("Entry" + (i * 2), i);
+        }
+        time = System.nanoTime();
+        instance.putAll(map2);
+        System.out.println("MapConnector took " + ((System.nanoTime() - time) / 1000000000.) + "seconds for map with " + uniqueInserts + "entires (" + (uniqueInserts / 2) + " copies) putAll");
+        instance.forceDelete();
+    }
+
+    @Test
+    public void reconnect() throws Exception {
+        System.out.println("Reconnect new connector");
+        instance.forceClear();
+        instance.put("foo", 42);
+        instance.load();
+        assertEquals(map.size(), 1);
+
+        instance.put("bar", 1337);
+        instance.load();
+        assertEquals(map.size(), 2);
         
+        Map<String, Integer> newMap = new HashMap<>();
+        StrIntBlockingConnector newConnector = new StrIntBlockingConnector(instance.getConnectorInfo());
+        newConnector.initialize(newMap);
+        newConnector.load();
+        assertEquals(map.size(), newMap.size());
         instance.forceDelete();
     }
 }

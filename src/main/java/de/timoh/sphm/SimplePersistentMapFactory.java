@@ -1,7 +1,7 @@
 package de.timoh.sphm;
 
 import de.timoh.sphm.loader.ConnectorInformation;
-import de.timoh.sphm.loader.StrIntConnector;
+import de.timoh.sphm.loader.StrIntBlockingConnector;
 import java.util.Map;
 
 /**
@@ -17,7 +17,7 @@ public class SimplePersistentMapFactory {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-        return new SimplePersistentHashMap<>(connectorInformation, new StrIntConnector(connectorInformation));
+        return new SimplePersistentHashMap<>(connectorInformation, new StrIntBlockingConnector(connectorInformation));
     }
     
 }

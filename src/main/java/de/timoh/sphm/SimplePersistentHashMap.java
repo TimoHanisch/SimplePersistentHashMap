@@ -3,6 +3,7 @@ package de.timoh.sphm;
 import de.timoh.sphm.loader.ConnectorInformation;
 import de.timoh.sphm.loader.MapConnector;
 import java.util.HashMap;
+import java.util.Map;
 
 public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
 
@@ -35,6 +36,12 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
             throw new RuntimeException(ex);
         }
         return super.put(key, value);
+    }
+    
+    @Override
+    public void putAll(Map<? extends K, ? extends V> map) {
+        
+        super.putAll(map);
     }
 
     @Override
