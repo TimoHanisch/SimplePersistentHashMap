@@ -1,5 +1,7 @@
-package de.timoh.sphm.loader;
+package de.timoh.sphm.connector.concurrent;
 
+import de.timoh.sphm.connector.ConnectorInformation;
+import de.timoh.sphm.connector.MapConnector;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,6 +17,12 @@ public class StrIntNonBlockingConnector extends MapConnector<String, Integer> {
         super(connectorInfo);
     }
 
+    /**
+     * Not final documentation: Still blocking
+     * 
+     * @return
+     * @throws Exception 
+     */
     @Override
     public MapConnector<String, Integer> load() throws Exception {
         getMap().clear();

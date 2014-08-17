@@ -1,7 +1,7 @@
 package de.timoh.sphm;
 
-import de.timoh.sphm.loader.ConnectorInformation;
-import de.timoh.sphm.loader.StrIntBlockingConnector;
+import de.timoh.sphm.connector.ConnectorInformation;
+import de.timoh.sphm.connector.StrIntBlockingConnector;
 import java.util.Map;
 
 /**
@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class SimplePersistentMapFactory {
 
-    public static Map<String, Integer> createStringIntegerSimplePersistentMap(String dbUrl, String dbUser, String dbPw, String tableName) {
+    public static Map<String, Integer> createStringIntegerSimplePersistentBlockingMap(String dbUrl, String dbUser, String dbPw, String tableName) {
         ConnectorInformation connectorInformation;
         try {
             connectorInformation = new ConnectorInformation(dbUrl, dbUser, dbPw, tableName);

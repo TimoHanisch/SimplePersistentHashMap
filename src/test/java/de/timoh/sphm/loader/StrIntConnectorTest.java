@@ -1,5 +1,7 @@
 package de.timoh.sphm.loader;
 
+import de.timoh.sphm.connector.ConnectorInformation;
+import de.timoh.sphm.connector.StrIntBlockingConnector;
 import java.util.HashMap;
 import java.util.Map;
 import static org.junit.Assert.*;

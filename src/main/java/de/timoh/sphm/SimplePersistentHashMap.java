@@ -1,7 +1,7 @@
 package de.timoh.sphm;
 
-import de.timoh.sphm.loader.ConnectorInformation;
-import de.timoh.sphm.loader.MapConnector;
+import de.timoh.sphm.connector.ConnectorInformation;
+import de.timoh.sphm.connector.MapConnector;
 import java.util.HashMap;
 import java.util.Map;
 

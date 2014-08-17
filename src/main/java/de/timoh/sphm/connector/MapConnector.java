@@ -1,10 +1,8 @@
-package de.timoh.sphm.loader;
+package de.timoh.sphm.connector;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  *
@@ -15,10 +13,6 @@ import java.util.concurrent.Executors;
 public abstract class MapConnector<K, V> {
     
     public static final int BLOCK_INSERT_COUNT = 500;
-    
-    public static final int WORKER_THREADS = 10;
-    
-    private static ExecutorService executor = Executors.newFixedThreadPool(WORKER_THREADS);
     
     private final ConnectorInformation connectorInfo;
 
@@ -64,9 +58,5 @@ public abstract class MapConnector<K, V> {
 
     public Map<K, V> getMap() {
         return map;
-    }
-    
-    public void executeRunnable(Runnable r) {
-        executor.execute(r);
     }
 }

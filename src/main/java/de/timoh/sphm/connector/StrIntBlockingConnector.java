@@ -1,4 +1,4 @@
-package de.timoh.sphm.loader;
+package de.timoh.sphm.connector;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
