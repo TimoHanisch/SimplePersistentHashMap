@@ -44,7 +44,6 @@ public abstract class ConcurrentMapConnector<K, V> extends MapConnector<K, V> im
                     try (Connection con = getConnectorInfo().getConnection()) {
 //                        synchronized (sqlJob) {
                         sqlJob.executeJob(con, getMap());
-                        sqlJob.notifyAll();
 //                        }
                     }
                 }
