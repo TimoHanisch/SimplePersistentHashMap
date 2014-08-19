@@ -2,16 +2,18 @@ package de.timoh.sphm.connector.concurrent;
 
 import de.timoh.sphm.connector.ConnectorInformation;
 import de.timoh.sphm.connector.MapConnector;
+import static de.timoh.sphm.connector.MapConnector.BLOCK_INSERT_COUNT;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Map;
 
 /**
  *
  * @author Timo Hanisch (timohanisch@gmail.com)
  */
-public class StrIntNonBlockingConnector extends MapConnector<String, Integer> {
+public class StrIntNonBlockingConnector extends ConcurrentMapConnector<String, Integer> {
 
     public StrIntNonBlockingConnector(ConnectorInformation connectorInfo) {
         super(connectorInfo);
@@ -19,9 +21,9 @@ public class StrIntNonBlockingConnector extends MapConnector<String, Integer> {
 
     /**
      * Not final documentation: Still blocking
-     * 
+     *
      * @return
-     * @throws Exception 
+     * @throws Exception
      */
     @Override
     public MapConnector<String, Integer> load() throws Exception {
@@ -40,31 +42,41 @@ public class StrIntNonBlockingConnector extends MapConnector<String, Integer> {
     }
 
     @Override
-    public MapConnector<String, Integer> forceSynchronization() throws Exception {
-        try (Connection con = getConnectorInfo().getConnection()) {
-            forceClear();
-            int n = 0;
-            StringBuilder values = new StringBuilder();
-            String stm;
-            for (String s : getMap().keySet()) {
-                if (n == BLOCK_INSERT_COUNT || n == getMap().size() - 1) {
-                    stm = "INSERT INTO " + getConnectorInfo().getTableName() + "(key,value) VALUES " + values.toString() + ";";
-                    try (PreparedStatement prepStm = con.prepareStatement(stm)) {
-                        prepStm.execute();
+    public MapConnector<String, Integer> forceSynchronization() throws SQLException {
+        super.addSQLJob(new SQLJob<String, Integer>() {
+            @Override
+            public void executeJob(Connection con, Map<String, Integer> map) throws SQLException {
+                StrIntNonBlockingConnector.this.forceClear();
+                int n = 0;
+                StringBuilder values = new StringBuilder();
+                String stm;
+                for (String s : getMap().keySet()) {
+                    if (n == BLOCK_INSERT_COUNT || n == getMap().size() - 1) {
+                        stm = "INSERT INTO " + getConnectorInfo().getTableName() + "(key,value) VALUES " + values.toString() + ";";
+                        try (PreparedStatement prepStm = con.prepareStatement(stm)) {
+                            prepStm.execute();
+                        }
+                        values = new StringBuilder();
+                        n = 0;
                     }
-                    values = new StringBuilder();
-                    n = 0;
+                    values = values.append("(").append("'").append(s).append("'").append(",").append(getMap().get(s)).append(")");
+                    if (n + 1 != BLOCK_INSERT_COUNT && n + 1 != getMap().size() - 1) {
+                        values = values.append(",");
+                    }
+                    n++;
                 }
-                values = values.append("(").append("'").append(s).append("'").append(",").append(getMap().get(s)).append(")");
-                if (n + 1 != BLOCK_INSERT_COUNT && n + 1 != getMap().size() - 1) {
-                    values = values.append(",");
-                }
-                n++;
             }
-        }
+        });
         return this;
     }
 
+    /**
+     * Still Blocking
+     *
+     * @param map
+     * @return
+     * @throws Exception
+     */
     @Override
     public MapConnector<String, Integer> initialize(Map<String, Integer> map) throws Exception {
         setMap(map);
@@ -82,63 +94,75 @@ public class StrIntNonBlockingConnector extends MapConnector<String, Integer> {
     }
 
     @Override
-    public MapConnector<String, Integer> put(String key, Integer value) throws Exception {
-        String stm;
-        if (getMap().containsKey(key)) {
-            stm = "SELECT insertIfExistsStrInt('" + key + "', " + value + ");";
-        } else {
-            stm = "INSERT INTO " + getConnectorInfo().getTableName() + "(key,value) VALUES ('" + key + "'," + value + ");";
-        }
-        try (Connection con = getConnectorInfo().getConnection(); PreparedStatement prepStm = con.prepareStatement(stm)) {
-            prepStm.execute();
-        }
+    public MapConnector<String, Integer> put(final String key, final Integer value) throws Exception {
+        super.addSQLJob(new SQLJob<String, Integer>() {
+            @Override
+            public void executeJob(Connection con, Map<String, Integer> map) throws SQLException {
+                String stm;
+                if (getMap().containsKey(key)) {
+                    stm = "SELECT insertIfExistsStrInt('" + key + "', " + value + ");";
+                } else {
+                    stm = "INSERT INTO " + getConnectorInfo().getTableName() + "(key,value) VALUES ('" + key + "'," + value + ");";
+                }
+                try (PreparedStatement prepStm = con.prepareStatement(stm)) {
+                    prepStm.execute();
+                }
+            }
+        });
         return this;
     }
 
     @Override
-    public MapConnector<String, Integer> putAll(Map<? extends String, ? extends Integer> map) throws Exception {
-        String stm;
-        try (Connection con = getConnectorInfo().getConnection()) {
-            stm = getCreateTableTmp(getConnectorInfo().getTableName());
-            try (PreparedStatement prepStm = con.prepareStatement(stm)) {
-                prepStm.execute();
+    public MapConnector<String, Integer> putAll(final Map<? extends String, ? extends Integer> map) throws Exception {
+        super.addSQLJob(new SQLJob<String, Integer>() {
+            @Override
+            public void executeJob(Connection con, Map<String, Integer> internalMap) throws SQLException {
+                String stm = getCreateTableTmp(getConnectorInfo().getTableName());
+                try (PreparedStatement prepStm = con.prepareStatement(stm)) {
+                    prepStm.execute();
+                }
+                int n = 0;
+                StringBuilder values = new StringBuilder();
+                for (String s : getMap().keySet()) {
+                    if (n == BLOCK_INSERT_COUNT || n == getMap().size() - 1) {
+                        stm = "INSERT INTO " + getConnectorInfo().getTableName() + "tmp(key,value) VALUES " + values.toString() + ";";
+                        try (PreparedStatement prepStm = con.prepareStatement(stm)) {
+                            prepStm.execute();
+                        }
+                        values = new StringBuilder();
+                        n = 0;
+                    }
+                    values = values.append("(").append("'").append(s).append("'").append(",").append(map.get(s)).append(")");
+                    if (n + 1 != BLOCK_INSERT_COUNT && n + 1 != getMap().size() - 1) {
+                        values = values.append(",");
+                    }
+                    n++;
+                }
+                stm = getMergeTables(getConnectorInfo().getTableName(), getConnectorInfo().getTableName() + "tmp");
+                try (PreparedStatement prepStm = con.prepareStatement(stm)) {
+                    prepStm.execute();
+                }
+                stm = "DROP TABLE " + getConnectorInfo().getTableName() + "tmp";
+                try (PreparedStatement prepStm = con.prepareStatement(stm)) {
+                    prepStm.execute();
+                }
             }
-            int n = 0;
-            StringBuilder values = new StringBuilder();
-            for (String s : getMap().keySet()) {
-                if (n == BLOCK_INSERT_COUNT || n == getMap().size() - 1) {
-                    stm = "INSERT INTO " + getConnectorInfo().getTableName() + "tmp(key,value) VALUES " + values.toString() + ";";
+        });
+        return this;
+    }
+
+    @Override
+    public MapConnector<String, Integer> remove(final String key) throws Exception {
+        if (getMap().containsKey(key)) {
+            super.addSQLJob(new SQLJob<String, Integer>() {
+                @Override
+                public void executeJob(Connection con, Map<String, Integer> map) throws SQLException {
+                    String stm = "DELETE FROM " + getConnectorInfo().getTableName() + " WHERE key = '" + key + "'";
                     try (PreparedStatement prepStm = con.prepareStatement(stm)) {
                         prepStm.execute();
                     }
-                    values = new StringBuilder();
-                    n = 0;
                 }
-                values = values.append("(").append("'").append(s).append("'").append(",").append(getMap().get(s)).append(")");
-                if (n + 1 != BLOCK_INSERT_COUNT && n + 1 != getMap().size() - 1) {
-                    values = values.append(",");
-                }
-                n++;
-            }
-            stm = getMergeTables(getConnectorInfo().getTableName(), getConnectorInfo().getTableName() + "tmp");
-            try (PreparedStatement prepStm = con.prepareStatement(stm)) {
-                prepStm.execute();
-            }
-            stm = "DROP TABLE " + getConnectorInfo().getTableName() + "tmp";
-            try (PreparedStatement prepStm = con.prepareStatement(stm)) {
-                prepStm.execute();
-            }
-        }
-        return this;
-    }
-
-    @Override
-    public MapConnector<String, Integer> remove(String key) throws Exception {
-        if (getMap().containsKey(key)) {
-            String stm = "DELETE FROM " + getConnectorInfo().getTableName() + " WHERE key = '" + key + "'";
-            try (Connection con = getConnectorInfo().getConnection(); PreparedStatement prepStm = con.prepareStatement(stm)) {
-                prepStm.execute();
-            }
+            });
         }
         return this;
     }

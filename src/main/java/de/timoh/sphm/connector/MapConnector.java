@@ -2,6 +2,7 @@ package de.timoh.sphm.connector;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Map;
 
 /**
@@ -34,14 +35,14 @@ public abstract class MapConnector<K, V> {
     
     public abstract MapConnector<K, V> remove(K key) throws Exception;
 
-    public void forceClear() throws Exception {
+    public void forceClear() throws SQLException {
         String stm = "TRUNCATE " + connectorInfo.getTableName() + ";";
         try (Connection con = connectorInfo.getConnection(); PreparedStatement prepStm = con.prepareStatement(stm)) {
             prepStm.execute();
         }
     }
 
-    public void forceDelete() throws Exception {
+    public void forceDelete() throws SQLException {
         String stm = "DROP TABLE " + connectorInfo.getTableName() + ";";
         try (Connection con = connectorInfo.getConnection(); PreparedStatement prepStm = con.prepareStatement(stm)) {
             prepStm.execute();
