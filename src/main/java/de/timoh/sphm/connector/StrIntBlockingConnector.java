@@ -25,6 +25,7 @@ public class StrIntBlockingConnector extends MapConnector<String, Integer> {
             while (resultSet.next()) {
                 key = resultSet.getString("key");
                 value = resultSet.getInt("value");
+                System.out.println("Key: "+key+" Value: "+value);
                 getMap().put(key, value);
             }
         }
@@ -39,6 +40,11 @@ public class StrIntBlockingConnector extends MapConnector<String, Integer> {
             StringBuilder values = new StringBuilder();
             String stm;
             for (String s : getMap().keySet()) {
+                values = values.append("(").append("'").append(s).append("'").append(",").append(getMap().get(s)).append(")");
+                if (n + 1 != BLOCK_INSERT_COUNT && n + 1 != getMap().size() - 1) {
+                    values = values.append(",");
+                }
+                n++;
                 if (n == BLOCK_INSERT_COUNT || n == getMap().size() - 1) {
                     stm = "INSERT INTO " + getConnectorInfo().getTableName() + "(key,value) VALUES " + values.toString() + ";";
                     try (PreparedStatement prepStm = con.prepareStatement(stm)) {
@@ -47,11 +53,6 @@ public class StrIntBlockingConnector extends MapConnector<String, Integer> {
                     values = new StringBuilder();
                     n = 0;
                 }
-                values = values.append("(").append("'").append(s).append("'").append(",").append(getMap().get(s)).append(")");
-                if (n + 1 != BLOCK_INSERT_COUNT && n + 1 != getMap().size() - 1) {
-                    values = values.append(",");
-                }
-                n++;
             }
         }
         return this;

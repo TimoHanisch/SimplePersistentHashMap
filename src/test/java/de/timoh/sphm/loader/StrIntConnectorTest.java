@@ -71,7 +71,6 @@ public class StrIntConnectorTest {
         instance.forceSynchronization();
         assertEquals(map.size(), 2);
 
-        System.out.println("REMOVE");
         instance.remove("foo");
         instance.load();
         assertEquals(map.size(), 1);
