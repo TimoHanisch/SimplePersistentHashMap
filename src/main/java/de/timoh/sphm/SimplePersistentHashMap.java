@@ -5,7 +5,7 @@ import de.timoh.sphm.connector.MapConnector;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
+class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
 
     private static final long serialVersionUID = -3452372538801457617L;
 
@@ -40,7 +40,11 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
     
     @Override
     public void putAll(Map<? extends K, ? extends V> map) {
-        
+        try {
+            mapConnector.putAll(map);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
         super.putAll(map);
     }
 
