@@ -25,7 +25,6 @@ public class StrIntBlockingConnector extends MapConnector<String, Integer> {
             while (resultSet.next()) {
                 key = resultSet.getString("key");
                 value = resultSet.getInt("value");
-                System.out.println("Key: "+key+" Value: "+value);
                 ((SimplePersistentHashMap<String, Integer>)getMap()).putIntern(key, value);
             }
         }

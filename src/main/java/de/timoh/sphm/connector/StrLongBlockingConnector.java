@@ -25,7 +25,6 @@ public class StrLongBlockingConnector extends MapConnector<String, Long> {
             while (resultSet.next()) {
                 key = resultSet.getString("key");
                 value = resultSet.getLong("value");
-                System.out.println("Key: "+key+" Value: "+value);
                 ((SimplePersistentHashMap<String, Long>)getMap()).putIntern(key, value);
             }
         }

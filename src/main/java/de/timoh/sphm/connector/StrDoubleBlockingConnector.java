@@ -25,7 +25,6 @@ public class StrDoubleBlockingConnector extends MapConnector<String, Double> {
             while (resultSet.next()) {
                 key = resultSet.getString("key");
                 value = resultSet.getDouble("value");
-                System.out.println("Key: "+key+" Value: "+value);
                 ((SimplePersistentHashMap<String, Double>)getMap()).putIntern(key, value);
             }
         }
