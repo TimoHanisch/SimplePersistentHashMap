@@ -58,7 +58,7 @@ public class ConnectorInformation {
             try (ResultSet tables = metaData.getTables(null, null, "%", null)) {
                 while (tables.next()) {
                     String localName = tables.getString(3);
-                    if (localName.equals(this.tableName)) {
+                    if (localName.equals(this.tableName.toLowerCase())) {
                         return true;
                     }
                 }
