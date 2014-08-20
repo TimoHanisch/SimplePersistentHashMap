@@ -26,7 +26,7 @@ public class StrDoubleBlockingConnector extends MapConnector<String, Double> {
                 key = resultSet.getString("key");
                 value = resultSet.getDouble("value");
                 System.out.println("Key: "+key+" Value: "+value);
-                getMap().put(key, value);
+                ((SimplePersistentHashMap<String, Double>)getMap()).putIntern(key, value);
             }
         }
         return this;
@@ -78,7 +78,7 @@ public class StrDoubleBlockingConnector extends MapConnector<String, Double> {
     public MapConnector<String, Double> put(String key, Double value) throws Exception {
         String stm;
         if (getMap().containsKey(key)) {
-            stm = "SELECT insertIfExistsStrInt('" + key + "', " + value + ");";
+            stm = "SELECT insertIfExistsStrDouble('" + key + "', " + value + ");";
         } else {
             stm = "INSERT INTO " + getConnectorInfo().getTableName() + "(key,value) VALUES ('" + key + "'," + value + ");";
         }
@@ -161,7 +161,7 @@ public class StrDoubleBlockingConnector extends MapConnector<String, Double> {
     }
 
     private static String getInsertIfExsists(String tableName) {
-        return "CREATE OR REPLACE FUNCTION insertIfExistsStrInt(k varchar(255),v bigint) \n"
+        return "CREATE OR REPLACE FUNCTION insertIfExistsStrDouble(k varchar(255),v double precision) \n"
                 + "        RETURNS bigint AS $$\n"
                 + "	BEGIN \n"
                 + "		DELETE FROM " + tableName + " WHERE key = k;\n"

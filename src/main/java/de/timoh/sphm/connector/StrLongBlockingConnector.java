@@ -26,7 +26,7 @@ public class StrLongBlockingConnector extends MapConnector<String, Long> {
                 key = resultSet.getString("key");
                 value = resultSet.getLong("value");
                 System.out.println("Key: "+key+" Value: "+value);
-                getMap().put(key, value);
+                ((SimplePersistentHashMap<String, Long>)getMap()).putIntern(key, value);
             }
         }
         return this;
@@ -78,7 +78,7 @@ public class StrLongBlockingConnector extends MapConnector<String, Long> {
     public MapConnector<String, Long> put(String key, Long value) throws Exception {
         String stm;
         if (getMap().containsKey(key)) {
-            stm = "SELECT insertIfExistsStrInt('" + key + "', " + value + ");";
+            stm = "SELECT insertIfExistsStrLong('" + key + "', " + value + ");";
         } else {
             stm = "INSERT INTO " + getConnectorInfo().getTableName() + "(key,value) VALUES ('" + key + "'," + value + ");";
         }
@@ -161,7 +161,7 @@ public class StrLongBlockingConnector extends MapConnector<String, Long> {
     }
 
     private static String getInsertIfExsists(String tableName) {
-        return "CREATE OR REPLACE FUNCTION insertIfExistsStrInt(k varchar(255),v bigint) \n"
+        return "CREATE OR REPLACE FUNCTION insertIfExistsStrLong(k varchar(255),v bigint) \n"
                 + "        RETURNS bigint AS $$\n"
                 + "	BEGIN \n"
                 + "		DELETE FROM " + tableName + " WHERE key = k;\n"

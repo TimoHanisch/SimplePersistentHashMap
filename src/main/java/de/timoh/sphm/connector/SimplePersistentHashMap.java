@@ -1,11 +1,10 @@
-package de.timoh.sphm;
+package de.timoh.sphm.connector;
 
-import de.timoh.sphm.connector.ConnectorInformation;
-import de.timoh.sphm.connector.MapConnector;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
+public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
 
     private static final long serialVersionUID = -3452372538801457617L;
 
@@ -13,7 +12,7 @@ class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
 
     private final MapConnector<K, V> mapConnector;
 
-    protected SimplePersistentHashMap(ConnectorInformation connectorInformation, MapConnector<K, V> mapConnector) {
+    public SimplePersistentHashMap(ConnectorInformation connectorInformation, MapConnector<K, V> mapConnector) {
         super();
         this.connectorInformation = connectorInformation;
         this.mapConnector = mapConnector;
@@ -36,6 +35,10 @@ class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
             throw new RuntimeException(ex);
         }
         return super.put(key, value);
+    }
+    
+    protected void putIntern(K key, V value) {
+        super.put(key, value);
     }
     
     @Override
@@ -80,7 +83,7 @@ class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
     public void forceClear() {
         try {
             mapConnector.forceClear();
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -88,7 +91,7 @@ class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
     public void forceDelete() {
         try {
             mapConnector.forceDelete();
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }

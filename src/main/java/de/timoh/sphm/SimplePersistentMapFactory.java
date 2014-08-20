@@ -1,5 +1,6 @@
 package de.timoh.sphm;
 
+import de.timoh.sphm.connector.SimplePersistentHashMap;
 import de.timoh.sphm.connector.ConnectorInformation;
 import de.timoh.sphm.connector.StrDoubleBlockingConnector;
 import de.timoh.sphm.connector.StrIntBlockingConnector;
