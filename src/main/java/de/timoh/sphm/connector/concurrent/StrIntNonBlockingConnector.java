@@ -22,11 +22,12 @@ public class StrIntNonBlockingConnector extends ConcurrentMapConnector<String, I
     /**
      * Not final documentation: Still blocking
      *
+     * @param map
      * @return
      * @throws Exception
      */
     @Override
-    public MapConnector<String, Integer> load() throws Exception {
+    public MapConnector<String, Integer> load(Map<String, Integer> map) throws Exception {
         getMap().clear();
         String stm = "SELECT * FROM " + getConnectorInfo().getTableName();
         String key;
@@ -35,7 +36,7 @@ public class StrIntNonBlockingConnector extends ConcurrentMapConnector<String, I
             while (resultSet.next()) {
                 key = resultSet.getString("key");
                 value = resultSet.getInt("value");
-                getMap().put(key, value);
+                map.put(key, value);
             }
         }
         return this;

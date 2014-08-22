@@ -1,5 +1,7 @@
-package de.timoh.sphm.connector;
+package de.timoh.sphm;
 
+import de.timoh.sphm.connector.ConnectorInformation;
+import de.timoh.sphm.connector.MapConnector;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +14,7 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
 
     private final MapConnector<K, V> mapConnector;
 
-    public SimplePersistentHashMap(ConnectorInformation connectorInformation, MapConnector<K, V> mapConnector) {
+    protected SimplePersistentHashMap(ConnectorInformation connectorInformation, MapConnector<K, V> mapConnector) {
         super();
         this.connectorInformation = connectorInformation;
         this.mapConnector = mapConnector;
@@ -21,7 +23,9 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
 
     private void initialize() {
         try {
-            this.mapConnector.initialize(this).load();
+            Map<K, V> map = new HashMap<>();
+            this.mapConnector.initialize(this).load(map);
+            super.putAll(map);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -35,10 +39,6 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
             throw new RuntimeException(ex);
         }
         return super.put(key, value);
-    }
-    
-    protected void putIntern(K key, V value) {
-        super.put(key, value);
     }
     
     @Override
