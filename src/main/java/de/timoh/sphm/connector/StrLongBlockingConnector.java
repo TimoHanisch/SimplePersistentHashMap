@@ -16,7 +16,7 @@ public class StrLongBlockingConnector extends MapConnector<String, Long> {
     }
 
     @Override
-    public MapConnector<String, Long> load() throws Exception {
+    public MapConnector<String, Long> load(Map<String, Long> map) throws Exception {
         getMap().clear();
         String stm = "SELECT * FROM " + getConnectorInfo().getTableName();
         String key;
@@ -25,7 +25,7 @@ public class StrLongBlockingConnector extends MapConnector<String, Long> {
             while (resultSet.next()) {
                 key = resultSet.getString("key");
                 value = resultSet.getLong("value");
-                ((SimplePersistentHashMap<String, Long>)getMap()).putIntern(key, value);
+                map.put(key, value);
             }
         }
         return this;

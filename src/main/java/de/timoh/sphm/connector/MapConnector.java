@@ -25,7 +25,7 @@ public abstract class MapConnector<K, V> {
 
     public abstract MapConnector<K, V> initialize(Map<K, V> map) throws Exception;
 
-    public abstract MapConnector<K, V> load() throws Exception;
+    public abstract MapConnector<K, V> load(Map<K, V> map) throws Exception;
 
     public abstract MapConnector<K, V> forceSynchronization() throws Exception;
 

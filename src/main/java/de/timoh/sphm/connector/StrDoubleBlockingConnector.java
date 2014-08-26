@@ -16,7 +16,7 @@ public class StrDoubleBlockingConnector extends MapConnector<String, Double> {
     }
 
     @Override
-    public MapConnector<String, Double> load() throws Exception {
+    public MapConnector<String, Double> load(Map<String, Double> map) throws Exception {
         getMap().clear();
         String stm = "SELECT * FROM " + getConnectorInfo().getTableName();
         String key;
@@ -25,7 +25,7 @@ public class StrDoubleBlockingConnector extends MapConnector<String, Double> {
             while (resultSet.next()) {
                 key = resultSet.getString("key");
                 value = resultSet.getDouble("value");
-                ((SimplePersistentHashMap<String, Double>)getMap()).putIntern(key, value);
+                map.put(key, value);
             }
         }
         return this;
