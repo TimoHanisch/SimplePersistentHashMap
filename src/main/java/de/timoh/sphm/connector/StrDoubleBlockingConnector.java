@@ -155,13 +155,13 @@ public class StrDoubleBlockingConnector extends MapConnector<String, Double> {
     private static String getCreateTableTmp(String tableName) {
         return "CREATE TABLE " + tableName + "tmp (\n"
                 + "key varchar(255) PRIMARY KEY,\n"
-                + "value bigint\n"
+                + "value double precision\n"
                 + ");";
     }
 
     private static String getInsertIfExsists(String tableName) {
         return "CREATE OR REPLACE FUNCTION insertIfExistsStrDouble(k varchar(255),v double precision) \n"
-                + "        RETURNS bigint AS $$\n"
+                + "        RETURNS double precision AS $$\n"
                 + "	BEGIN \n"
                 + "		DELETE FROM " + tableName + " WHERE key = k;\n"
                 + "		INSERT INTO " + tableName + "(key,value) VALUES (k,v);\n"
