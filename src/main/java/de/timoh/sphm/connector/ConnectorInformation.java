@@ -7,15 +7,13 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sql.DataSource;
 import org.apache.commons.dbcp2.cpdsadapter.DriverAdapterCPDS;
 import org.apache.commons.dbcp2.datasources.SharedPoolDataSource;
 
 /**
- *
- * @author Timo Hanisch (timohanisch@gmail.com)
+ * This class stores some information about the database connectiong. 
+ * @author <a href="mailto:timohanisch@gmail.com">Timo Hanisch</a>
  */
 public class ConnectorInformation {
 
@@ -51,6 +49,13 @@ public class ConnectorInformation {
         this.tableName = tableName;
     }
 
+    /**
+     * Checks whether the table connected with this information exists in the 
+     * database.
+     * 
+     * @return
+     * @throws SQLException 
+     */
     public boolean tableExists() throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
             DatabaseMetaData metaData = connection.getMetaData();
@@ -67,10 +72,21 @@ public class ConnectorInformation {
         return false;
     }
 
+    /**
+     * Returns the actual connection object.
+     * 
+     * @return 
+     * @throws SQLException
+     */
     public Connection getConnection() throws SQLException {
         return dataSource.getConnection();
     }
 
+    /**
+     * Gets the table name connected with this connection information.
+     * 
+     * @return 
+     */
     public String getTableName() {
         return tableName;
     }

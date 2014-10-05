@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
  *
- * @author Timo Hanisch (timohanisch@gmail.com)
+ * @author <a href="mailto:timohanisch@gmail.com">Timo Hanisch</a>
  */
 public class StrIntNonBlockingConnector extends ConcurrentMapConnector<String, Integer> {
 

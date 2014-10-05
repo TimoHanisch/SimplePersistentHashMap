@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  *
- * @author Timo Hanisch (timohanisch@gmail.com)
+ * @author <a href="mailto:timohanisch@gmail.com">Timo Hanisch</a>
  */
 public class StrDoubleBlockingConnector extends MapConnector<String, Double> {
 

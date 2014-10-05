@@ -6,6 +6,14 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The SimplePersistentHashMap overrides the HashMap and offers some persistent
+ * methods.
+ * 
+ * @author <a href="mailto:timohanisch@gmail.com">Timo Hanisch</a>
+ * @param <K>
+ * @param <V> 
+ */
 public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
 
     private static final long serialVersionUID = -3452372538801457617L;
@@ -62,7 +70,7 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
     }
 
     /**
-     *
+     * Reloads all elements from the database into the map.
      */
     public void reload() {
         super.clear();
@@ -70,7 +78,8 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
     }
 
     /**
-     *
+     * Forces the map to synchronize with the database, meaning all elements get
+     * rewritten to the database.
      */
     public void forceSynchronization() {
         try {
@@ -80,6 +89,9 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
         }
     }
 
+    /**
+     * Clears the map and the table in the database.
+     */
     public void forceClear() {
         try {
             mapConnector.forceClear();
@@ -88,6 +100,9 @@ public class SimplePersistentHashMap<K, V> extends HashMap<K, V> {
         }
     }
     
+    /**
+     * Delets the table in the database.
+     */
     public void forceDelete() {
         try {
             mapConnector.forceDelete();

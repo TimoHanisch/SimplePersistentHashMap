@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  *
- * @author Timo Hanisch (timohanisch@gmail.com)
+ * @author <a href="mailto:timohanisch@gmail.com">Timo Hanisch</a>
  * @param <K>
  * @param <V>
  */
